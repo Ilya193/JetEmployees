@@ -1,4 +1,4 @@
-package ru.ikom.jetemployees.ui.theme
+package ru.ikom.common
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
