@@ -19,7 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
-import ru.ikom.home.HomeScreen
+import ru.ikom.home.presentation.HomeScreen
 import ru.ikom.common.JetEmployeesTheme
 
 class MainActivity : ComponentActivity() {

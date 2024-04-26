@@ -51,4 +51,5 @@ dependencies {
 
     implementation(libs.koin)
     implementation(libs.coil)
+    implementation(libs.lifecycle.runtime.compose)
 }

@@ -1,4 +1,4 @@
-package ru.ikom.home
+package ru.ikom.home.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

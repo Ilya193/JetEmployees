@@ -1,6 +1,6 @@
-package ru.ikom.home
+package ru.ikom.home.domain
 
-data class EmployeeUi(
+data class EmployeeDomain(
     val avatarUrl: String,
     val birthday: String,
     val department: String,

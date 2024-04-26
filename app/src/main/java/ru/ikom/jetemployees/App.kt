@@ -6,7 +6,7 @@ import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
-import ru.ikom.home.featureHomeModule
+import ru.ikom.home.di.featureHomeModule
 
 class App : Application(), ImageLoaderFactory {
 

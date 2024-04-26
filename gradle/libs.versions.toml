@@ -18,6 +18,7 @@ navigation-compose = "2.7.7"
 coil = "2.6.0"
 appcompat = "1.6.1"
 material = "1.11.0"
+lifecycle-runtime-compose = "2.7.0"
 
 
 [libraries]
@@ -43,9 +44,7 @@ converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-k
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization"}
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose"}
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil"}
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-
+lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle-runtime-compose"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="enter_the_name_tag_email">Введи имя, тег, почту...</string>
+    <string name="something_broke">Какой-то сверхразум все сломал</string>
+    <string name="fix_it">Постараемся быстро починить</string>
+    <string name="retry">Попробовать снова</string>
+    <string name="cancel">Отмена</string>
 </resources>
