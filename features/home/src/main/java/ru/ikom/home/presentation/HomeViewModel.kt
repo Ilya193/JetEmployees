@@ -16,8 +16,8 @@ class HomeViewModel(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
 
-    private val departments = generateDepartments()
     private var employees = mutableListOf<EmployeeUi>()
+    private var showEmployees = mutableListOf<EmployeeUi>()
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> get() = _uiState
 
@@ -26,6 +26,8 @@ class HomeViewModel(
             is Event.Fetch -> fetchEmployees()
             is Event.SelectCategory -> selectCategory(event.index)
             is Event.Refresh -> refresh()
+            is Event.Input -> input(event.value)
+            is Event.Cancel -> cancel()
         }
     }
 
@@ -33,7 +35,8 @@ class HomeViewModel(
         when (val result = repository.fetchEmployees()) {
             is LoadResult.Success -> {
                 employees = result.data.map { it.toEmployeeUi() }.toMutableList()
-                _uiState.value = HomeUiState(employees = employees.toList())
+                showEmployees = employees.toMutableList()
+                _uiState.value = HomeUiState(employees = showEmployees.toList())
             }
 
             is LoadResult.Error -> _uiState.value = HomeUiState(isError = true)
@@ -46,8 +49,9 @@ class HomeViewModel(
     }
 
     private fun selectCategory(index: Int) = viewModelScope.launch(dispatcher) {
+        val departments = _uiState.value.departments.toMutableList()
         val item = departments[index]
-        val filtered = mutableListOf<EmployeeUi>()
+        showEmployees.clear()
 
         if (!item.isSelected) {
             if (index == 0) _uiState.value = HomeUiState(employees = employees.toList())
@@ -57,14 +61,36 @@ class HomeViewModel(
                     else departments[i] = departments[i].copy(isSelected = false)
                 }
 
-                _uiState.update {
-                    val word = item.title.lowercase()
-                    employees.forEach { employee ->
-                        if (word in employee.department) filtered.add(employee)
-                    }
-                    it.copy(employees = filtered, departments = departments.toList())
+                val word = item.title.lowercase()
+                employees.forEach { employee ->
+                    if (word in employee.department) showEmployees.add(employee)
                 }
+                _uiState.value = HomeUiState(employees = showEmployees.toList(), departments = departments.toList())
             }
+        }
+    }
+
+    private fun input(value: String) = viewModelScope.launch(dispatcher) {
+        val filtered = mutableListOf<EmployeeUi>()
+        val word = value.lowercase()
+        showEmployees.forEach { employee ->
+            if (word in employee.firstName.lowercase() || word in employee.lastName.lowercase() || word in employee.userTag.lowercase())
+                filtered.add(employee)
+        }
+        _uiState.update { it.copy(employees = filtered.toList()) }
+    }
+
+    private fun cancel() = viewModelScope.launch(dispatcher) {
+        val departments = _uiState.value.departments.toMutableList()
+        val index = departments.indexOfFirst { it.isSelected }
+        showEmployees.clear()
+        if (index == 0) _uiState.value = HomeUiState(employees = employees.toList())
+        else {
+            val word = departments[index].title.lowercase()
+            employees.forEach { employee ->
+                if (word in employee.department) showEmployees.add(employee)
+            }
+            _uiState.value = HomeUiState(employees = showEmployees.toList(), departments = departments.toList())
         }
     }
 }
@@ -81,4 +107,6 @@ sealed interface Event {
     data object Fetch : Event
     data class SelectCategory(val index: Int) : Event
     data object Refresh : Event
+    data class Input(val value: String) : Event
+    data object Cancel : Event
 }

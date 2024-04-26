@@ -1,6 +1,8 @@
 package ru.ikom.home.presentation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,13 +55,14 @@ import ru.ikom.home.R
 fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var inputEmployee by remember { mutableStateOf("") }
-
     val pullRefreshState = rememberPullToRefreshState()
     val scrollState = rememberLazyListState()
 
+    var inputEmployee by remember { mutableStateOf("") }
+
     if (pullRefreshState.isRefreshing) {
         LaunchedEffect(Unit) {
+            inputEmployee = ""
             viewModel.action(Event.Refresh)
         }
     }
@@ -97,6 +100,7 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                                 value = inputEmployee,
                                 onValueChange = {
                                     inputEmployee = it
+                                    viewModel.action(Event.Input(inputEmployee))
                                 },
                                 placeholder = { Text(text = stringResource(R.string.enter_the_name_tag_email)) },
                                 leadingIcon = {
@@ -121,9 +125,20 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                             )
                             if (inputEmployee.isNotEmpty())
                                 Text(
-                                    modifier = Modifier.weight(0.25f),
+                                    modifier = Modifier.weight(0.25f)
+                                        .clickable(
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            indication = null
+                                        ) {
+                                            inputEmployee = ""
+                                            viewModel.action(Event.Cancel)
+                                        },
                                     text = stringResource(R.string.cancel),
-                                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Purple)
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        color = Purple
+                                    )
                                 )
                         }
 
