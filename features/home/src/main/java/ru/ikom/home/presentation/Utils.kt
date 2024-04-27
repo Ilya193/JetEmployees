@@ -1,17 +1,17 @@
 package ru.ikom.home.presentation
 
-fun generateDepartments(): MutableList<CategoryUi> = mutableListOf(
-    CategoryUi(0, "Все", true),
-    CategoryUi(1, "Android"),
-    CategoryUi(2, "iOS"),
-    CategoryUi(3, "Design"),
-    CategoryUi(4, "Management"),
-    CategoryUi(5, "QA"),
-    CategoryUi(6, "Back-office"),
-    CategoryUi(7, "Frontend"),
-    CategoryUi(8, "HR"),
-    CategoryUi(9, "PR"),
-    CategoryUi(10, "Backend"),
-    CategoryUi(11, "Support"),
-    CategoryUi(12, "Analytics"),
+fun generateDepartments(): MutableList<DepartmentUi> = mutableListOf(
+    DepartmentUi(0, "Все", true),
+    DepartmentUi(1, "Android"),
+    DepartmentUi(2, "iOS"),
+    DepartmentUi(3, "Design"),
+    DepartmentUi(4, "Management"),
+    DepartmentUi(5, "QA"),
+    DepartmentUi(6, "Back-office"),
+    DepartmentUi(7, "Frontend"),
+    DepartmentUi(8, "HR"),
+    DepartmentUi(9, "PR"),
+    DepartmentUi(10, "Backend"),
+    DepartmentUi(11, "Support"),
+    DepartmentUi(12, "Analytics"),
 )
