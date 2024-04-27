@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="enter_the_name_tag_email">Введи имя, тег, почту...</string>
+    <string name="something_broke">Какой-то сверхразум все сломал</string>
+    <string name="fix_it">Постараемся быстро починить</string>
+    <string name="retry">Попробовать снова</string>
+    <string name="cancel">Отмена</string>
+    <string name="sorting">Сортировка</string>
+    <string name="sorting_alphabetically">По алфавиту</string>
+    <string name="sorting_date_of_birth">По дате рождения</string>
+    <string name="correct_request">Попробуй скорректировать запрос</string>
+    <string name="nothing_found">Мы ничего не нашли</string>
+</resources>
