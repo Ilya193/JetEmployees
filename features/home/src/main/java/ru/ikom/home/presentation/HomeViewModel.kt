@@ -28,6 +28,8 @@ class HomeViewModel(
             is Event.Refresh -> refresh()
             is Event.Input -> input(event.value)
             is Event.Cancel -> cancel()
+            is Event.Dialog -> dialog(event.show)
+            is Event.Filter -> filter(event.value)
         }
     }
 
@@ -54,8 +56,10 @@ class HomeViewModel(
         showEmployees.clear()
 
         if (!item.isSelected) {
-            if (index == 0) _uiState.value = HomeUiState(employees = employees.toList())
-            else {
+            if (index == 0) {
+                showEmployees = employees.toMutableList()
+                _uiState.value = HomeUiState(employees = employees.toList())
+            } else {
                 for (i in departments.indices) {
                     if (departments[i] == item) departments[i] = departments[i].copy(isSelected = true)
                     else departments[i] = departments[i].copy(isSelected = false)
@@ -65,32 +69,77 @@ class HomeViewModel(
                 employees.forEach { employee ->
                     if (word in employee.department) showEmployees.add(employee)
                 }
-                _uiState.value = HomeUiState(employees = showEmployees.toList(), departments = departments.toList())
+                _uiState.value = HomeUiState(
+                    employees = showEmployees.toList(),
+                    departments = departments.toList()
+                )
             }
         }
     }
 
     private fun input(value: String) = viewModelScope.launch(dispatcher) {
-        val filtered = mutableListOf<EmployeeUi>()
+        val departments = _uiState.value.departments
+        val index = _uiState.value.departments.indexOfFirst { it.isSelected }
+        showEmployees.clear()
         val word = value.lowercase()
-        showEmployees.forEach { employee ->
-            if (word in employee.firstName.lowercase() || word in employee.lastName.lowercase() || word in employee.userTag.lowercase())
-                filtered.add(employee)
+        employees.forEach { employee ->
+            val title = departments[index].title.lowercase()
+            if (word.isEmpty() && title in employee.department) showEmployees.add(employee)
+            else if (word.isEmpty() && index == 0) showEmployees.add(employee)
+            else if (word in employee.firstName.lowercase() || word in employee.lastName.lowercase() || word in employee.userTag.lowercase()) {
+                if (index == 0) showEmployees.add(employee)
+                else if (title in employee.department) showEmployees.add(employee)
+            }
         }
-        _uiState.update { it.copy(employees = filtered.toList()) }
+        _uiState.value.filter?.let {
+            showEmployees = when (it) {
+                FilterMode.ALPHABET -> showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
+                FilterMode.DATE_OF_BIRTH -> showEmployees.sortedBy { it.birthday }.toMutableList()
+            }
+        }
+        _uiState.update {
+            it.copy(
+                employees = showEmployees.toList(),
+                nothingFound = if (showEmployees.isEmpty()) NothingFound.SEARCH else NothingFound.INIT
+            )
+        }
     }
 
     private fun cancel() = viewModelScope.launch(dispatcher) {
         val departments = _uiState.value.departments.toMutableList()
         val index = departments.indexOfFirst { it.isSelected }
         showEmployees.clear()
-        if (index == 0) _uiState.value = HomeUiState(employees = employees.toList())
-        else {
+        if (index == 0) {
+            showEmployees = employees.toMutableList()
+            _uiState.value = HomeUiState(employees = showEmployees.toList())
+        } else {
             val word = departments[index].title.lowercase()
             employees.forEach { employee ->
                 if (word in employee.department) showEmployees.add(employee)
             }
             _uiState.value = HomeUiState(employees = showEmployees.toList(), departments = departments.toList())
+        }
+    }
+
+    private fun dialog(show: Boolean) = viewModelScope.launch(dispatcher) {
+        if (!show) cancel()
+        else _uiState.update { it.copy(showDialog = true) }
+    }
+
+    private fun filter(value: FilterMode?) = viewModelScope.launch(dispatcher) {
+        if (value == null) cancel()
+        else {
+            showEmployees = when (value) {
+                FilterMode.ALPHABET -> showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
+                FilterMode.DATE_OF_BIRTH -> showEmployees.sortedBy { it.birthday }.toMutableList()
+            }
+            _uiState.update {
+                it.copy(
+                    employees = showEmployees.toList(),
+                    showDialog = false,
+                    filter = value
+                )
+            }
         }
     }
 }
@@ -101,7 +150,20 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val isError: Boolean = false,
     val showRefresh: Boolean = false,
+    val showDialog: Boolean = false,
+    val filter: FilterMode? = null,
+    val nothingFound: NothingFound = NothingFound.INIT,
 )
+
+enum class NothingFound {
+    INIT,
+    SEARCH,
+}
+
+enum class FilterMode {
+    ALPHABET,
+    DATE_OF_BIRTH
+}
 
 sealed interface Event {
     data object Fetch : Event
@@ -109,4 +171,6 @@ sealed interface Event {
     data object Refresh : Event
     data class Input(val value: String) : Event
     data object Cancel : Event
+    data class Dialog(val show: Boolean) : Event
+    data class Filter(val value: FilterMode?) : Event
 }
