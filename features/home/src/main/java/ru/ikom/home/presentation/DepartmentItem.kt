@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import ru.ikom.common.Purple
 
 @Composable
-fun CategoryItem(item: CategoryUi, onClick: () -> Unit) {
+fun DepartmentItem(item: DepartmentUi, onClick: () -> Unit) {
     Box(
         modifier = Modifier.wrapContentWidth().fillMaxHeight().drawBehind {
             drawLine(
@@ -61,7 +61,7 @@ fun CategoryItem(item: CategoryUi, onClick: () -> Unit) {
                     .widthIn(min = 50.dp)
                     .align(Alignment.Center),
                 textAlign = TextAlign.Center,
-                text = item.title,
+                text = item.name,
                 style = TextStyle(
                     fontWeight = if (item.isSelected) FontWeight.Bold else FontWeight.Normal,
                     fontSize = 16.sp,

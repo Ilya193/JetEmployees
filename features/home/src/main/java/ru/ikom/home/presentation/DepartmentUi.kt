@@ -1,7 +1,7 @@
 package ru.ikom.home.presentation
 
-data class CategoryUi(
+data class DepartmentUi(
     val id: Int,
-    val title: String,
+    val name: String,
     val isSelected: Boolean = false,
 )
