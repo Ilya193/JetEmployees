@@ -7,10 +7,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import ru.ikom.home.domain.EmployeesRepository
 import ru.ikom.home.domain.LoadResult
 
 class HomeViewModel(
+    private val router: HomeRouter,
     private val repository: EmployeesRepository,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
@@ -32,6 +35,10 @@ class HomeViewModel(
     private val _inputUiState = MutableStateFlow(InputUiState())
     val inputUiState: StateFlow<InputUiState> get() = _inputUiState
 
+    init {
+        fetchEmployees()
+    }
+
     fun action(event: Event) = viewModelScope.launch(dispatcher) {
         when (event) {
             is Event.Fetch -> fetchEmployees()
@@ -40,6 +47,7 @@ class HomeViewModel(
             is Event.Filter -> filterMode(event.filter, event.show)
             is Event.Input -> input(event.value)
             is Event.Cancel -> input("")
+            is Event.OpenDetails -> router.openDetails(Json.encodeToString(event.employee))
         }
     }
 
@@ -73,8 +81,13 @@ class HomeViewModel(
             if (!item.isSelected) {
                 if (index == 0) {
                     showEmployees = employees.toMutableList()
+                    when (_filterUiState.value.filter) {
+                        FilterMode.ALPHABET -> showEmployees = showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
+                        FilterMode.DATE_OF_BIRTH -> showEmployees = showEmployees.sortedBy { it.birthday }.toMutableList()
+                        else -> {}
+                    }
                     _departmentsUiState.value = DepartmentsUiState()
-                    _employeesUiState.value = EmployeesUiState.Data(employees = employees.toList())
+                    _employeesUiState.value = EmployeesUiState.Data(employees = showEmployees.toList())
                 } else {
                     for (i in departments.indices) {
                         if (departments[i] == item) departments[i] =
@@ -88,12 +101,8 @@ class HomeViewModel(
                     }
 
                     when (_filterUiState.value.filter) {
-                        FilterMode.ALPHABET -> showEmployees =
-                            showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
-
-                        FilterMode.DATE_OF_BIRTH -> showEmployees =
-                            showEmployees.sortedBy { it.birthday }.toMutableList()
-
+                        FilterMode.ALPHABET -> showEmployees = showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
+                        FilterMode.DATE_OF_BIRTH -> showEmployees = showEmployees.sortedBy { it.birthday }.toMutableList()
                         else -> {}
                     }
 
@@ -191,4 +200,6 @@ sealed interface Event {
     ) : Event
 
     data object Cancel : Event
+
+    data class OpenDetails(val employee: EmployeeUi) : Event
 }

@@ -1,4 +1,4 @@
-package ru.ikom.home.presentation
+package ru.ikom.details
 
 import kotlinx.serialization.Serializable
 

@@ -1,5 +1,7 @@
 package ru.ikom.home.presentation
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -24,14 +27,20 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import ru.ikom.common.EmployeeInformation
 
 @Composable
-fun EmployeeItem(employee: EmployeeUi) {
+fun EmployeeItem(employee: EmployeeUi, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .height(80.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
     ) {
         Row(
             modifier = Modifier.fillMaxSize()
@@ -49,26 +58,11 @@ fun EmployeeItem(employee: EmployeeUi) {
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        ) {
-                            append("${employee.firstName} ${employee.lastName}")
-                        }
-
-                        withStyle(style = SpanStyle(fontSize = 14.sp, color = Color.Gray)) {
-                            append(" ${employee.userTag}")
-                        }
-                    },
-                )
-                Text(
-                    text = employee.department,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                EmployeeInformation(
+                    employee.firstName,
+                    employee.lastName,
+                    employee.userTag,
+                    employee.department
                 )
             }
         }

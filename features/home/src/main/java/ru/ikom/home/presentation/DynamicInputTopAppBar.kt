@@ -45,6 +45,10 @@ fun DynamicInputTopAppBar(
 ) {
     var inputEmployee by remember { mutableStateOf("") }
 
+    LaunchedEffect(Unit) {
+        inputEmployee = state
+    }
+
     LaunchedEffect(state) {
         if (state.isEmpty()) inputEmployee = ""
     }
