@@ -18,6 +18,6 @@ val featureHomeModule = module {
     }
 
     viewModel<HomeViewModel> {
-        HomeViewModel(get())
+        HomeViewModel(get(), get())
     }
 }

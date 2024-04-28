@@ -15,12 +15,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import ru.ikom.home.presentation.HomeScreen
 import ru.ikom.common.JetEmployeesTheme
+import ru.ikom.details.DetailsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +68,10 @@ fun Content(viewModel: MainViewModel = koinViewModel()) {
     ) {
         composable(Screens.HOME) {
             HomeScreen()
+        }
+
+        composable(Screens.DETAILS) {
+            DetailsScreen(it.arguments?.getString("data") ?: "")
         }
     }
 

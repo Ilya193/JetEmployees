@@ -4,13 +4,15 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.ikom.details.DetailsRouter
+import ru.ikom.home.presentation.HomeRouter
 
 interface Navigation<T> {
     fun read(): StateFlow<T>
     fun update(value: T)
     fun coup()
 
-    class Base : Navigation<Screen> {
+    class Base : Navigation<Screen>, HomeRouter, DetailsRouter {
         private val screen = MutableStateFlow<Screen>(Screen.Start)
 
         override fun read(): StateFlow<Screen> = screen.asStateFlow()
@@ -22,6 +24,14 @@ interface Navigation<T> {
         override fun coup() {
             update(Screen.Coup)
         }
+
+        override fun openDetails(data: String) {
+            update(DetailsScreen(data))
+        }
+
+        override fun pop() {
+            update(Screen.Pop())
+        }
     }
 }
 
@@ -32,12 +42,14 @@ interface Screen {
         private val route: String,
         private val data: String,
     ) : Screen {
-        override fun show(navController: NavController) = navController.navigate(
-            route.replace(
-                "{data}",
-                data
+        override fun show(navController: NavController) {
+            navController.navigate(
+                route.replace(
+                    "{data}",
+                    data
+                )
             )
-        )
+        }
     }
 
     data object Start : Screen
@@ -49,3 +61,7 @@ interface Screen {
         }
     }
 }
+
+class DetailsScreen(
+    data: String,
+) : Screen.ReplaceWithArguments(Screens.DETAILS, data)

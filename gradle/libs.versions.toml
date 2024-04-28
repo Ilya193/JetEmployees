@@ -19,6 +19,8 @@ coil = "2.6.0"
 appcompat = "1.6.1"
 material = "1.11.0"
 lifecycle-runtime-compose = "2.7.0"
+appcompatVersion = "1.6.1"
+materialVersion = "1.11.0"
 
 
 [libraries]
@@ -45,6 +47,8 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose"}
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil"}
 lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle-runtime-compose"}
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompatVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

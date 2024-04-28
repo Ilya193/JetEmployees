@@ -33,7 +33,8 @@ fun EmployeesData(
     refresh: () -> Unit,
     launchDialog: () -> Unit,
     input: (String) -> Unit,
-    cancel: () -> Unit
+    cancel: () -> Unit,
+    onClick: (EmployeeUi) -> Unit
 ) {
     val pullRefreshState = rememberPullToRefreshState()
     val scrollState = rememberLazyListState()
@@ -86,7 +87,7 @@ fun EmployeesData(
                     state = scrollState
                 ) {
                     items(state.employees, key = { item -> item.id }) {
-                        EmployeeItem(employee = it)
+                        EmployeeItem(employee = it) { onClick(it) }
                     }
                 }
             }

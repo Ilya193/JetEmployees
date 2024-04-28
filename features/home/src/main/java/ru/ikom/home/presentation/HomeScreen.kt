@@ -14,10 +14,6 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     val filterUiState by viewModel.filterUiState.collectAsStateWithLifecycle()
     val inputUiState by viewModel.inputUiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.action(Event.Fetch)
-    }
-
     when (val state = employeesState) {
         is EmployeesUiState.Loading -> LoadingEmployees(departmentsUiState.departments)
         is EmployeesUiState.Error -> Error { viewModel.action(Event.Fetch) }
@@ -30,7 +26,8 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
             refresh = { viewModel.action(Event.Refresh) },
             launchDialog = { viewModel.action(Event.Filter(filterUiState.filter, true)) },
             input = { viewModel.action(Event.Input(it)) },
-            cancel = { viewModel.action(Event.Cancel) })
+            cancel = { viewModel.action(Event.Cancel) },
+            onClick = { viewModel.action(Event.OpenDetails(it)) })
     }
 
     if (filterUiState.show) {
