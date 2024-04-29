@@ -21,3 +21,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "JetEmployees"
 include(":app")
+include(":features")
+include(":features:home")
+include(":core")
+include(":core:network")
+include(":data")
+include(":data:employees")
+include(":common")
+include(":features:details")
+include(":core:database")
