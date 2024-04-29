@@ -1,5 +1,7 @@
 package ru.ikom.home.domain
 
+import kotlinx.coroutines.flow.Flow
+
 interface EmployeesRepository {
-    suspend fun fetchEmployees(): LoadResult<List<EmployeeDomain>>
+    fun fetchEmployees(): Flow<LoadResult<List<EmployeeDomain>>>
 }

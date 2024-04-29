@@ -10,4 +10,6 @@
     <string name="sorting_date_of_birth">По дате рождения</string>
     <string name="correct_request">Попробуй скорректировать запрос</string>
     <string name="nothing_found">Мы ничего не нашли</string>
+    <string name="information_load">Гружу...</string>
+    <string name="information_load_error">Не могу обновить данные. Поверь соединение с интернетом</string>
 </resources>

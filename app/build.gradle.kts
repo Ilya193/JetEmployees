@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":common"))
     implementation(project(":features:details"))
+    implementation(project(":core:database"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

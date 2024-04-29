@@ -20,9 +20,16 @@ data class FilterUiState(val filter: FilterMode? = null, val show: Boolean = fal
 
 data class InputUiState(val input: String = "")
 
+data class DataLoadInformationState(val state: LoadInformation? = null)
+
 enum class NothingFound {
     INIT,
     SEARCH,
+}
+
+enum class LoadInformation {
+    LOADING,
+    ERROR
 }
 
 enum class FilterMode {

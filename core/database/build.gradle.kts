@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "ru.ikom.employees"
+    namespace = "ru.ikom.database"
     compileSdk = 34
 
     defaultConfig {
@@ -31,8 +32,10 @@ android {
         jvmTarget = "1.8"
     }
 }
+
 dependencies {
-    api(project(":core:network"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-    api(project(":core:database"))
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
+    api(libs.room.ktx)
+    ksp(libs.room.compiler)
 }

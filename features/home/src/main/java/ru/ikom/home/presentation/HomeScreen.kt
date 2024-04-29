@@ -1,7 +1,6 @@
 package ru.ikom.home.presentation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
@@ -13,6 +12,7 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     val refreshUiState by viewModel.refreshUiState.collectAsStateWithLifecycle()
     val filterUiState by viewModel.filterUiState.collectAsStateWithLifecycle()
     val inputUiState by viewModel.inputUiState.collectAsStateWithLifecycle()
+    val dataLoadInformationState by viewModel.dataLoadInformation.collectAsStateWithLifecycle()
 
     when (val state = employeesState) {
         is EmployeesUiState.Loading -> LoadingEmployees(departmentsUiState.departments)
@@ -22,6 +22,7 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
             departments = departmentsUiState.departments,
             refreshState = refreshUiState.show,
             inputState = inputUiState.input,
+            dataLoadState = dataLoadInformationState,
             selectDepartment = { viewModel.action(Event.SelectDepartments(it)) },
             refresh = { viewModel.action(Event.Refresh) },
             launchDialog = { viewModel.action(Event.Filter(filterUiState.filter, true)) },
