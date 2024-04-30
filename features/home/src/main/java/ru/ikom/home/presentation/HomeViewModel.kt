@@ -56,22 +56,8 @@ class HomeViewModel(
 
     private fun fetchEmployees(init: Boolean = false) = viewModelScope.launch(dispatcher) {
         repository.fetchEmployees().collect {
-            if (it.loading) {
-                if (it.data.isEmpty() && init) {
-                    _employeesUiState.value = EmployeesUiState.Loading
-                    _dataLoadInformationState.value = DataLoadInformationState()
-                }
-                else if (init) {
-                    employees = it.data.map { it.toEmployeeUi() }.toMutableList()
-                    showEmployees = employees.toMutableList()
-                    _employeesUiState.value = EmployeesUiState.Data(showEmployees.toList())
-                    _dataLoadInformationState.value = DataLoadInformationState(state = LoadInformation.LOADING)
-                }
-            }
-
-            if (it.error != null) {
-                if (it.data.isEmpty()) _employeesUiState.value = EmployeesUiState.Error
-                else {
+            when (it) {
+                is LoadResult.Success -> {
                     employees = it.data.map { it.toEmployeeUi() }.toMutableList()
                     showEmployees = employees.toMutableList()
                     _employeesUiState.value = EmployeesUiState.Data(showEmployees.toList())
@@ -79,19 +65,33 @@ class HomeViewModel(
                     _departmentsUiState.value = DepartmentsUiState()
                     _filterUiState.value = FilterUiState()
                     _inputUiState.value = InputUiState()
-                    _dataLoadInformationState.value = DataLoadInformationState(state = LoadInformation.ERROR)
+                    _dataLoadInformationState.value = DataLoadInformationState()
                 }
-            }
-
-            if (!it.loading && it.error == null) {
-                employees = it.data.map { it.toEmployeeUi() }.toMutableList()
-                showEmployees = employees.toMutableList()
-                _employeesUiState.value = EmployeesUiState.Data(showEmployees.toList())
-                _refreshUiState.value = RefreshUiState()
-                _departmentsUiState.value = DepartmentsUiState()
-                _filterUiState.value = FilterUiState()
-                _inputUiState.value = InputUiState()
-                _dataLoadInformationState.value = DataLoadInformationState()
+                is LoadResult.Loading -> {
+                    if (it.data.isEmpty() && init) {
+                        _employeesUiState.value = EmployeesUiState.Loading
+                        _dataLoadInformationState.value = DataLoadInformationState()
+                    }
+                    else if (init) {
+                        employees = it.data.map { it.toEmployeeUi() }.toMutableList()
+                        showEmployees = employees.toMutableList()
+                        _employeesUiState.value = EmployeesUiState.Data(showEmployees.toList())
+                        _dataLoadInformationState.value = DataLoadInformationState(state = LoadInformation.LOADING)
+                    }
+                }
+                is LoadResult.Error -> {
+                    if (it.data.isEmpty()) _employeesUiState.value = EmployeesUiState.Error
+                    else {
+                        employees = it.data.map { it.toEmployeeUi() }.toMutableList()
+                        showEmployees = employees.toMutableList()
+                        _employeesUiState.value = EmployeesUiState.Data(showEmployees.toList())
+                        _refreshUiState.value = RefreshUiState()
+                        _departmentsUiState.value = DepartmentsUiState()
+                        _filterUiState.value = FilterUiState()
+                        _inputUiState.value = InputUiState()
+                        _dataLoadInformationState.value = DataLoadInformationState(state = LoadInformation.ERROR)
+                    }
+                }
             }
         }
     }

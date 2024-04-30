@@ -17,26 +17,28 @@ class EmployeesRepositoryImplTest(
     private val cacheDataSource: EmployeesCacheDataSource,
 ) : EmployeesRepository {
     override fun fetchEmployees(): Flow<LoadResult<List<EmployeeDomain>>> {
-        var state = LoadResult<List<EmployeeDomain>>(data = emptyList())
+        var employees = emptyList<EmployeeDomain>()
+        var isLoading = true
         val cacheFlow: Flow<LoadResult<List<EmployeeDomain>>> = flow {
             cacheDataSource.fetchEmployees().map { it.map { it.toEmployeeDomain() } }.collect {
-                state = state.copy(data = it)
-                if (state.data.isNotEmpty()) emit(state)
+                if (it.isNotEmpty()) {
+                    employees = it.toList()
+                    if (isLoading) emit(LoadResult.Loading(employees))
+                    else emit(LoadResult.Success(employees))
+                }
             }
         }
         val cloudFlow: Flow<LoadResult<List<EmployeeDomain>>> = flow {
             try {
-                state = state.copy(loading = true, error = null)
-                emit(state)
+                emit(LoadResult.Loading(employees))
                 val employeesData = cloudDataSource.fetchEmployees()
                 cacheDataSource.deleteAll()
                 cacheDataSource.insertAll(employeesData)
-                state = state.copy(loading = false, error = null)
-                emit(state)
+                isLoading = false
             } catch (e: UnknownHostException) {
-                emit(state.copy(loading = false, error = ErrorType.NO_CONNECTION))
+                emit(LoadResult.Error(employees.toList(), ErrorType.NO_CONNECTION))
             } catch (e: Exception) {
-                emit(state.copy(data = emptyList(), loading = false, error = ErrorType.NO_CONNECTION))
+                emit(LoadResult.Error(emptyList(), ErrorType.GENERIC_ERROR))
             }
         }
 
