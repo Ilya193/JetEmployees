@@ -19,9 +19,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +35,7 @@ fun EmployeesData(
     departments: List<DepartmentUi>,
     refreshState: Boolean,
     inputState: String,
-    dataLoadState: DataLoadInformationState,
+    dataLoadState: LoadInformation,
     selectDepartment: (Int) -> Unit,
     refresh: () -> Unit,
     launchDialog: () -> Unit,
@@ -65,7 +62,9 @@ fun EmployeesData(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            modifier = Modifier.fillMaxSize().nestedScroll(pullRefreshState.nestedScrollConnection),
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(pullRefreshState.nestedScrollConnection),
             topBar = {
                 DynamicInputTopAppBar(
                     state = inputState,
@@ -74,7 +73,9 @@ fun EmployeesData(
                     cancel = cancel
                 )
             }) { paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues).fillMaxWidth()) {
+            Box(modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxWidth()) {
                 PullToRefreshContainer(
                     modifier = Modifier.align(Alignment.Center),
                     state = pullRefreshState,
@@ -82,7 +83,9 @@ fun EmployeesData(
             }
 
             Box(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)) {
                     LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -109,13 +112,16 @@ fun EmployeesData(
                     }
                 }
 
-                dataLoadState.state?.let {
-                    val color = if (it == LoadInformation.LOADING) Color.Blue else Color.Red
-                    val value = if (it == LoadInformation.LOADING) stringResource(R.string.information_load)
+                if (dataLoadState != LoadInformation.INIT) {
+                    val color = if (dataLoadState == LoadInformation.LOADING) Color.Blue else Color.Red
+                    val value = if (dataLoadState == LoadInformation.LOADING) stringResource(R.string.information_load)
                     else stringResource(R.string.information_load_error)
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(80.dp)
-                            .align(Alignment.BottomCenter).background(color = color),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp)
+                            .align(Alignment.BottomCenter)
+                            .background(color = color),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

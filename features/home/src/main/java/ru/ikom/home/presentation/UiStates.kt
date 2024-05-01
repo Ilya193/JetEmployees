@@ -1,5 +1,15 @@
 package ru.ikom.home.presentation
 
+data class HomeUiState(
+    val employeesState: EmployeesUiState = EmployeesUiState.Loading,
+    val departments: List<DepartmentUi> = generateDepartments(),
+    val showRefresh: Boolean = false,
+    val filterState: FilterUiState = FilterUiState(),
+    val input: String = "",
+    val loadInformationState: LoadInformation = LoadInformation.INIT,
+    val nothingFoundState: NothingFound = NothingFound.INIT
+)
+
 sealed interface EmployeesUiState {
     data object Loading : EmployeesUiState
 
@@ -12,15 +22,7 @@ sealed interface EmployeesUiState {
     ) : EmployeesUiState
 }
 
-data class DepartmentsUiState(val departments: List<DepartmentUi> = generateDepartments())
-
-data class RefreshUiState(val show: Boolean = false)
-
 data class FilterUiState(val filter: FilterMode? = null, val show: Boolean = false)
-
-data class InputUiState(val input: String = "")
-
-data class DataLoadInformationState(val state: LoadInformation? = null)
 
 enum class NothingFound {
     INIT,
@@ -28,6 +30,7 @@ enum class NothingFound {
 }
 
 enum class LoadInformation {
+    INIT,
     LOADING,
     ERROR
 }
