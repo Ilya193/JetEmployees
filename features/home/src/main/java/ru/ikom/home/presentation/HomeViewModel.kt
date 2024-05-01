@@ -6,6 +6,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,25 +20,11 @@ class HomeViewModel(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
     private var employees = mutableListOf<EmployeeUi>()
     private var showEmployees = mutableListOf<EmployeeUi>()
-    private val _employeesUiState = MutableStateFlow<EmployeesUiState>(EmployeesUiState.Loading)
-    val employeesUiState: StateFlow<EmployeesUiState> get() = _employeesUiState
-
-    private val _departmentsUiState = MutableStateFlow(DepartmentsUiState())
-    val departmentsUiState: StateFlow<DepartmentsUiState> get() = _departmentsUiState
-
-    private val _refreshUiState = MutableStateFlow(RefreshUiState())
-    val refreshUiState: StateFlow<RefreshUiState> get() = _refreshUiState
-
-    private val _filterUiState = MutableStateFlow(FilterUiState())
-    val filterUiState: StateFlow<FilterUiState> get() = _filterUiState
-
-    private val _inputUiState = MutableStateFlow(InputUiState())
-    val inputUiState: StateFlow<InputUiState> get() = _inputUiState
-
-    private val _dataLoadInformationState = MutableStateFlow(DataLoadInformationState())
-    val dataLoadInformation: StateFlow<DataLoadInformationState> get() = _dataLoadInformationState
 
     init {
         fetchEmployees(true)
@@ -60,36 +48,42 @@ class HomeViewModel(
                 is LoadResult.Success -> {
                     employees = it.data.map { it.toEmployeeUi() }.toMutableList()
                     showEmployees = employees.toMutableList()
-                    _employeesUiState.value = EmployeesUiState.Data(showEmployees.toList())
-                    _refreshUiState.value = RefreshUiState()
-                    _departmentsUiState.value = DepartmentsUiState()
-                    _filterUiState.value = FilterUiState()
-                    _inputUiState.value = InputUiState()
-                    _dataLoadInformationState.value = DataLoadInformationState()
+                    _uiState.value = HomeUiState(employeesState = EmployeesUiState.Data(showEmployees.toList()))
                 }
+
                 is LoadResult.Loading -> {
                     if (it.data.isEmpty() && init) {
-                        _employeesUiState.value = EmployeesUiState.Loading
-                        _dataLoadInformationState.value = DataLoadInformationState()
-                    }
-                    else if (init) {
+                        _uiState.update {
+                            it.copy(
+                                employeesState = EmployeesUiState.Loading,
+                                loadInformationState = LoadInformation.INIT
+                            )
+                        }
+                    } else if (init) {
                         employees = it.data.map { it.toEmployeeUi() }.toMutableList()
                         showEmployees = employees.toMutableList()
-                        _employeesUiState.value = EmployeesUiState.Data(showEmployees.toList())
-                        _dataLoadInformationState.value = DataLoadInformationState(state = LoadInformation.LOADING)
+
+                        _uiState.update {
+                            it.copy(
+                                employeesState = EmployeesUiState.Data(showEmployees.toList()),
+                                loadInformationState = LoadInformation.LOADING
+                            )
+                        }
                     }
                 }
+
                 is LoadResult.Error -> {
-                    if (it.data.isEmpty()) _employeesUiState.value = EmployeesUiState.Error
+                    if (it.data.isEmpty()) {
+                        _uiState.value = HomeUiState(employeesState = EmployeesUiState.Error)
+                    }
                     else {
                         employees = it.data.map { it.toEmployeeUi() }.toMutableList()
                         showEmployees = employees.toMutableList()
-                        _employeesUiState.value = EmployeesUiState.Data(showEmployees.toList())
-                        _refreshUiState.value = RefreshUiState()
-                        _departmentsUiState.value = DepartmentsUiState()
-                        _filterUiState.value = FilterUiState()
-                        _inputUiState.value = InputUiState()
-                        _dataLoadInformationState.value = DataLoadInformationState(state = LoadInformation.ERROR)
+
+                        _uiState.value = HomeUiState(
+                            employeesState = EmployeesUiState.Data(employees.toList()),
+                            loadInformationState = LoadInformation.ERROR
+                        )
                     }
                 }
             }
@@ -97,29 +91,40 @@ class HomeViewModel(
     }
 
     private fun refresh() = viewModelScope.launch(dispatcher) {
-        _refreshUiState.value = RefreshUiState(true)
+        _uiState.update { it.copy(showRefresh = true) }
         fetchEmployees()
     }
 
     private fun selectDepartments(index: Int) =
         viewModelScope.launch(dispatcher) {
-            val departments = _departmentsUiState.value.departments.toMutableList()
+            val departments = uiState.value.departments.toMutableList()
             val item = departments[index]
             showEmployees.clear()
 
             if (!item.isSelected) {
                 if (index == 0) {
                     showEmployees = employees.toMutableList()
-                    when (_filterUiState.value.filter) {
-                        FilterMode.ALPHABET -> showEmployees = showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
-                        FilterMode.DATE_OF_BIRTH -> showEmployees = showEmployees.sortedBy { it.birthday }.toMutableList()
+                    when (uiState.value.filterState.filter) {
+                        FilterMode.ALPHABET -> showEmployees =
+                            showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
+
+                        FilterMode.DATE_OF_BIRTH -> showEmployees =
+                            showEmployees.sortedBy { it.birthday }.toMutableList()
+
                         else -> {}
                     }
-                    _departmentsUiState.value = DepartmentsUiState()
-                    _employeesUiState.value = EmployeesUiState.Data(employees = showEmployees.toList())
+
+                    _uiState.update {
+                        it.copy(
+                            employeesState = EmployeesUiState.Data(showEmployees.toList()),
+                            departments = generateDepartments(),
+                            input = ""
+                        )
+                    }
                 } else {
                     for (i in departments.indices) {
-                        if (departments[i] == item) departments[i] = departments[i].copy(isSelected = true)
+                        if (departments[i] == item) departments[i] =
+                            departments[i].copy(isSelected = true)
                         else departments[i] = departments[i].copy(isSelected = false)
                     }
 
@@ -128,31 +133,43 @@ class HomeViewModel(
                         if (word in employee.department) showEmployees.add(employee)
                     }
 
-                    when (_filterUiState.value.filter) {
-                        FilterMode.ALPHABET -> showEmployees = showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
-                        FilterMode.DATE_OF_BIRTH -> showEmployees = showEmployees.sortedBy { it.birthday }.toMutableList()
+                    when (uiState.value.filterState.filter) {
+                        FilterMode.ALPHABET -> showEmployees =
+                            showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
+
+                        FilterMode.DATE_OF_BIRTH -> showEmployees =
+                            showEmployees.sortedBy { it.birthday }.toMutableList()
+
                         else -> {}
                     }
 
-                    _departmentsUiState.value = DepartmentsUiState(departments = departments)
-                    _employeesUiState.value = EmployeesUiState.Data(
-                        employees = showEmployees.toList(),
-                        nothingFound = if (showEmployees.isEmpty()) NothingFound.SEARCH else NothingFound.INIT
-                    )
-                    _inputUiState.value = InputUiState()
+                    _uiState.update {
+                        it.copy(
+                            employeesState = EmployeesUiState.Data(
+                                showEmployees.toList(),
+                                nothingFound = if (showEmployees.isEmpty()) NothingFound.SEARCH else NothingFound.INIT
+                            ),
+                            departments = departments,
+                            input = ""
+                        )
+                    }
                 }
             }
         }
 
     private fun filterMode(filter: FilterMode?, show: Boolean) = viewModelScope.launch(dispatcher) {
-        if (show) _filterUiState.value = FilterUiState(filter, true)
+        if (show) _uiState.update { it.copy(filterState = FilterUiState(filter, true)) }
         else {
             when (filter) {
-                FilterMode.ALPHABET -> showEmployees = showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
-                FilterMode.DATE_OF_BIRTH -> showEmployees = showEmployees.sortedBy { it.birthday }.toMutableList()
+                FilterMode.ALPHABET -> showEmployees =
+                    showEmployees.sortedBy { it.firstName + it.lastName }.toMutableList()
+
+                FilterMode.DATE_OF_BIRTH -> showEmployees =
+                    showEmployees.sortedBy { it.birthday }.toMutableList()
+
                 null -> {
                     showEmployees.clear()
-                    val departments = _departmentsUiState.value.departments.toMutableList()
+                    val departments = uiState.value.departments.toMutableList()
                     val index = departments.indexOfFirst { it.isSelected }
                     val word = departments[index].name.lowercase()
                     employees.forEach { employee ->
@@ -161,7 +178,7 @@ class HomeViewModel(
                     }
                 }
             }
-            val input = _inputUiState.value.input.lowercase()
+            val input = uiState.value.input.lowercase()
             if (input.isNotEmpty()) {
                 val filtered = mutableListOf<EmployeeUi>()
                 showEmployees.forEach { employee ->
@@ -172,17 +189,19 @@ class HomeViewModel(
                 }
                 showEmployees = filtered
             }
-            _filterUiState.value = FilterUiState(filter, false)
-            _employeesUiState.value = EmployeesUiState.Data(
-                employees = showEmployees.toList(),
-                nothingFound = if (showEmployees.isEmpty()) NothingFound.SEARCH else NothingFound.INIT
-            )
+
+            _uiState.update {
+                it.copy(employeesState = EmployeesUiState.Data(
+                    employees = showEmployees.toList(),
+                    nothingFound = if (showEmployees.isEmpty()) NothingFound.SEARCH else NothingFound.INIT
+                ), filterState = FilterUiState(filter, false))
+            }
         }
     }
 
     private fun input(value: String) = viewModelScope.launch(dispatcher) {
-        _inputUiState.value = InputUiState(value)
-        val departments = _departmentsUiState.value.departments
+        _uiState.update { it.copy(input = value) }
+        val departments = uiState.value.departments
         val index = departments.indexOfFirst { it.isSelected }
         val word = value.lowercase()
         val filtered = mutableListOf<EmployeeUi>()
@@ -195,15 +214,17 @@ class HomeViewModel(
                 else if (departmentName in employee.department) filtered.add(employee)
             }
         }
-        showEmployees = when (_filterUiState.value.filter) {
+        showEmployees = when (uiState.value.filterState.filter) {
             FilterMode.ALPHABET -> filtered.sortedBy { it.firstName + it.lastName }.toMutableList()
             FilterMode.DATE_OF_BIRTH -> filtered.sortedBy { it.birthday }.toMutableList()
             else -> filtered
         }
-        _employeesUiState.value = EmployeesUiState.Data(
-            employees = showEmployees.toList(),
-            nothingFound = if (showEmployees.isEmpty()) NothingFound.SEARCH else NothingFound.INIT
-        )
+        _uiState.update {
+            it.copy(employeesState = EmployeesUiState.Data(
+                employees = showEmployees.toList(),
+                nothingFound = if (showEmployees.isEmpty()) NothingFound.SEARCH else NothingFound.INIT
+            ))
+        }
     }
 }
 

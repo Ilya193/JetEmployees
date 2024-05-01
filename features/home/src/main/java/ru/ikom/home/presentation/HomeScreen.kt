@@ -7,32 +7,27 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
-    val employeesState by viewModel.employeesUiState.collectAsStateWithLifecycle()
-    val departmentsUiState by viewModel.departmentsUiState.collectAsStateWithLifecycle()
-    val refreshUiState by viewModel.refreshUiState.collectAsStateWithLifecycle()
-    val filterUiState by viewModel.filterUiState.collectAsStateWithLifecycle()
-    val inputUiState by viewModel.inputUiState.collectAsStateWithLifecycle()
-    val dataLoadInformationState by viewModel.dataLoadInformation.collectAsStateWithLifecycle()
+    val stateTest by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when (val state = employeesState) {
-        is EmployeesUiState.Loading -> LoadingEmployees(departmentsUiState.departments)
+    when (val state = stateTest.employeesState) {
+        is EmployeesUiState.Loading -> LoadingEmployees(stateTest.departments)
         is EmployeesUiState.Error -> Error { viewModel.action(Event.Fetch) }
         is EmployeesUiState.Data -> EmployeesData(
             state = state,
-            departments = departmentsUiState.departments,
-            refreshState = refreshUiState.show,
-            inputState = inputUiState.input,
-            dataLoadState = dataLoadInformationState,
+            departments = stateTest.departments,
+            refreshState = stateTest.showRefresh,
+            inputState = stateTest.input,
+            dataLoadState = stateTest.loadInformationState,
             selectDepartment = { viewModel.action(Event.SelectDepartments(it)) },
             refresh = { viewModel.action(Event.Refresh) },
-            launchDialog = { viewModel.action(Event.Filter(filterUiState.filter, true)) },
+            launchDialog = { viewModel.action(Event.Filter(stateTest.filterState.filter, true)) },
             input = { viewModel.action(Event.Input(it)) },
             cancel = { viewModel.action(Event.Cancel) },
             onClick = { viewModel.action(Event.OpenDetails(it)) })
     }
 
-    if (filterUiState.show) {
-        ChoiseModalBottomSheet(filterUiState.filter) {
+    if (stateTest.filterState.show) {
+        ChoiseModalBottomSheet(stateTest.filterState.filter) {
             viewModel.action(Event.Filter(it, false))
         }
     }
