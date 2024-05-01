@@ -47,4 +47,11 @@ dependencies {
     api(libs.androidx.ui.graphics)
     api(libs.androidx.ui.tooling.preview)
     api(libs.androidx.material3)
+
+    api(libs.koin)
+    api(libs.coil)
+    api(libs.lifecycle.runtime.compose)
+
+    api(libs.converter.kotlinx.serialization)
+    api(libs.kotlinx.serialization.json)
 }
