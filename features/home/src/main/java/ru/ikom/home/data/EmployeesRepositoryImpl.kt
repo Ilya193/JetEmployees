@@ -12,7 +12,7 @@ import ru.ikom.home.domain.ErrorType
 import ru.ikom.home.domain.LoadResult
 import java.net.UnknownHostException
 
-class EmployeesRepositoryImplTest(
+class EmployeesRepositoryImpl(
     private val cloudDataSource: EmployeesCloudDataSource,
     private val cacheDataSource: EmployeesCacheDataSource,
 ) : EmployeesRepository {
@@ -36,7 +36,7 @@ class EmployeesRepositoryImplTest(
                 cacheDataSource.insertAll(employeesData)
                 isLoading = false
             } catch (e: UnknownHostException) {
-                emit(LoadResult.Error(employees.toList(), ErrorType.NO_CONNECTION))
+                emit(LoadResult.Error(employees, ErrorType.NO_CONNECTION))
             } catch (e: Exception) {
                 emit(LoadResult.Error(emptyList(), ErrorType.GENERIC_ERROR))
             }
