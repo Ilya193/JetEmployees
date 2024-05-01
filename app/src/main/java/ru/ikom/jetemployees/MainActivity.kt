@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Content(viewModel: MainViewModel = koinViewModel()) {
     val navController = rememberNavController()
-    val screen by viewModel.read().collectAsState()
+    val screen by viewModel.read().collectAsStateWithLifecycle()
 
     DisposableEffect(Unit) {
         onDispose {
