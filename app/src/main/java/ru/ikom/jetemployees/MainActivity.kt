@@ -11,20 +11,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
-import ru.ikom.home.presentation.HomeScreen
 import ru.ikom.common.JetEmployeesTheme
 import ru.ikom.details.DetailsScreen
+import ru.ikom.home.presentation.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,16 +50,14 @@ fun Content(viewModel: MainViewModel = koinViewModel()) {
         }
     }
 
-    LaunchedEffect(Unit) {
-        snapshotFlow {
-            screen
-        }.collect {
-            screen.show(navController)
-        }
+    LaunchedEffect(screen) {
+        screen.show(navController)
     }
 
     NavHost(
-        modifier = Modifier.fillMaxSize().systemBarsPadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
         navController = navController,
         startDestination = Screens.HOME
     ) {
