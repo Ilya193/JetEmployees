@@ -1,5 +1,6 @@
 package ru.ikom.home.data
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -30,7 +31,6 @@ class EmployeesRepositoryImpl(
         }
         val cloudFlow: Flow<LoadResult<List<EmployeeDomain>>> = flow {
             try {
-                emit(LoadResult.Loading(employees))
                 val employeesData = cloudDataSource.fetchEmployees()
                 cacheDataSource.deleteAll()
                 cacheDataSource.insertAll(employeesData)

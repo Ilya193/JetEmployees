@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -44,15 +45,19 @@ fun DetailsScreen(
 ) {
     val employeeUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Box(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(24.dp)) {
         Image(
-            modifier = Modifier.align(Alignment.TopStart)
+            modifier = Modifier
+                .align(Alignment.TopStart)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) { viewModel.pop() },
             painter = painterResource(R.drawable.ic_back),
-            contentDescription = null
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
         )
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -60,7 +65,8 @@ fun DetailsScreen(
         ) {
             employeeUiState.employeeUi?.let { employee ->
                 AsyncImage(
-                    modifier = Modifier.width(80.dp)
+                    modifier = Modifier
+                        .width(80.dp)
                         .clip(CircleShape), model = employee.avatarUrl, contentDescription = null
                 )
                 Spacer(Modifier.height(16.dp))
@@ -77,7 +83,8 @@ fun DetailsScreen(
                 ) {
                     Image(
                         painter = painterResource(R.drawable.ic_favorite),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
                     )
                     Text(modifier = Modifier.padding(horizontal = 8.dp), text = employee.birthday)
                 }
@@ -86,7 +93,11 @@ fun DetailsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    Image(painter = painterResource(R.drawable.ic_phone), contentDescription = null)
+                    Image(
+                        painter = painterResource(R.drawable.ic_phone),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
+                    )
                     Text(modifier = Modifier.padding(horizontal = 8.dp), text = employee.phone)
                 }
             }
