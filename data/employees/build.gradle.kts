@@ -33,6 +33,6 @@ android {
 }
 dependencies {
     api(project(":core:network"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation(libs.kotlinx.coroutines.android)
     api(project(":core:database"))
 }
