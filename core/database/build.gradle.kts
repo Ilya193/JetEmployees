@@ -34,8 +34,8 @@ android {
 }
 
 dependencies {
-    implementation(libs.room.runtime)
+    api(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
-    api(libs.room.ktx)
+    implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 }
