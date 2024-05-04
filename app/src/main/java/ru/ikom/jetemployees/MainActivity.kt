@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.RootScreen
 import com.github.terrakok.modo.Screen
 import com.github.terrakok.modo.stack.StackNavModel
 import com.github.terrakok.modo.stack.StackScreen
@@ -29,7 +30,7 @@ import ru.ikom.details.DetailsScreen
 import ru.ikom.home.presentation.HomeScreen
 
 class MainActivity : ComponentActivity() {
-    private var rootScreen: StackScreen? = null
+    private var rootScreen: RootScreen<MainStack>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()

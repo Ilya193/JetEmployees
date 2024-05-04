@@ -51,6 +51,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("com.github.terrakok:modo-compose:0.7.1")
-
+    implementation(libs.modo.compose)
 }

@@ -12,6 +12,7 @@ composeBom = "2024.04.01"
 ksp = "1.9.23-1.0.20"
 
 koin = "3.5.6"
+modoCompose = "0.8.0"
 retrofit = "2.11.0"
 kotlin-serialization = "1.9.23"
 kotlinx-serialization = "1.6.3"
@@ -43,6 +44,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 
 koin = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+modo-compose = { module = "com.github.terrakok:modo-compose", version.ref = "modoCompose" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 kotlin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin-serialization" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
