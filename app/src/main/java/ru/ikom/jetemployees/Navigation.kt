@@ -1,67 +1,55 @@
 package ru.ikom.jetemployees
 
-import androidx.navigation.NavController
+import com.github.terrakok.modo.NavigationContainer
+import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.stack.StackState
+import com.github.terrakok.modo.stack.back
+import com.github.terrakok.modo.stack.forward
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.ikom.details.DetailsRouter
+import ru.ikom.details.DetailsScreen
 import ru.ikom.home.presentation.HomeRouter
+
+sealed interface NavigationCommand {
+    data object Init : NavigationCommand
+    data class Forward(val screen: Screen) : NavigationCommand
+    data object Pop : NavigationCommand
+}
+
+fun NavigationContainer<StackState>.launchScreen(command: NavigationCommand) {
+    when (command) {
+        is NavigationCommand.Init -> {}
+        is NavigationCommand.Forward -> forward(command.screen)
+        is NavigationCommand.Pop -> back()
+    }
+}
 
 interface Navigation<T> {
     fun read(): StateFlow<T>
     fun update(value: T)
     fun coup()
 
-    class Base : Navigation<Screen>, HomeRouter, DetailsRouter {
-        private val screen = MutableStateFlow<Screen>(Screen.Start)
+    class Base : Navigation<NavigationCommand>, HomeRouter, DetailsRouter {
+        private val screen = MutableStateFlow<NavigationCommand>(NavigationCommand.Init)
 
-        override fun read(): StateFlow<Screen> = screen.asStateFlow()
+        override fun read(): StateFlow<NavigationCommand> = screen.asStateFlow()
 
-        override fun update(value: Screen) {
+        override fun update(value: NavigationCommand) {
             screen.value = value
         }
 
         override fun coup() {
-            update(Screen.Coup)
+            update(NavigationCommand.Init)
         }
 
         override fun openDetails(data: String) {
-            update(DetailsScreen(data))
+            update(NavigationCommand.Forward(DetailsScreen(data)))
         }
 
         override fun pop() {
-            update(Screen.Pop())
+            update(NavigationCommand.Pop)
         }
     }
 }
-
-interface Screen {
-    fun show(navController: NavController) = Unit
-
-    abstract class ReplaceWithArguments(
-        private val route: String,
-        private val data: String,
-    ) : Screen {
-        override fun show(navController: NavController) {
-            navController.navigate(
-                route.replace(
-                    "{data}",
-                    data
-                )
-            )
-        }
-    }
-
-    data object Start : Screen
-    data object Coup : Screen
-
-    class Pop : Screen {
-        override fun show(navController: NavController) {
-            navController.popBackStack()
-        }
-    }
-}
-
-class DetailsScreen(
-    data: String,
-) : Screen.ReplaceWithArguments(Screens.DETAILS, data)

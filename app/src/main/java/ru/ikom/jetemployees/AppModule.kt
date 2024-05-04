@@ -16,7 +16,7 @@ import ru.ikom.network.EmployeesService
 val appModule = module {
     val navigation = Navigation.Base()
 
-    single<Navigation<Screen>> { navigation }
+    single<Navigation<NavigationCommand>> { navigation }
 
     single<HomeRouter> { navigation }
 

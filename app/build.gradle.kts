@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -66,4 +67,6 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.navigation.compose)
+
+    implementation("com.github.terrakok:modo-compose:0.7.1")
 }

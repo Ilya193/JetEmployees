@@ -33,72 +33,79 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.github.terrakok.modo.Screen
+import com.github.terrakok.modo.ScreenKey
+import com.github.terrakok.modo.generateScreenKey
+import kotlinx.parcelize.Parcelize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import ru.ikom.common.EmployeeInformation
 
+@Parcelize
+class DetailsScreen(
+    private val data: String,
+    override val screenKey: ScreenKey = generateScreenKey()
+) : Screen {
+    @Composable
+    override fun Content() {
+        val viewModel: DetailsViewModel = koinViewModel { parametersOf(data) }
+        val employeeUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-@Composable
-fun DetailsScreen(
-    data: String,
-    viewModel: DetailsViewModel = koinViewModel { parametersOf(data) },
-) {
-    val employeeUiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(24.dp)) {
-        Image(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { viewModel.pop() },
-            painter = painterResource(R.drawable.ic_back),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
-        )
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            employeeUiState.employeeUi?.let { employee ->
-                AsyncImage(
-                    modifier = Modifier
-                        .width(80.dp)
-                        .clip(CircleShape), model = employee.avatarUrl, contentDescription = null
-                )
-                Spacer(Modifier.height(16.dp))
-                EmployeeInformation(
-                    employee.firstName,
-                    employee.lastName,
-                    employee.userTag,
-                    employee.department
-                )
-                Spacer(Modifier.height(36.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_favorite),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)) {
+            Image(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { viewModel.pop() },
+                painter = painterResource(R.drawable.ic_back),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
+            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                employeeUiState.employeeUi?.let { employee ->
+                    AsyncImage(
+                        modifier = Modifier
+                            .width(80.dp)
+                            .clip(CircleShape), model = employee.avatarUrl, contentDescription = null
                     )
-                    Text(modifier = Modifier.padding(horizontal = 8.dp), text = employee.birthday)
-                }
-                Spacer(Modifier.height(36.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_phone),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
+                    Spacer(Modifier.height(16.dp))
+                    EmployeeInformation(
+                        employee.firstName,
+                        employee.lastName,
+                        employee.userTag,
+                        employee.department
                     )
-                    Text(modifier = Modifier.padding(horizontal = 8.dp), text = employee.phone)
+                    Spacer(Modifier.height(36.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_favorite),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
+                        )
+                        Text(modifier = Modifier.padding(horizontal = 8.dp), text = employee.birthday)
+                    }
+                    Spacer(Modifier.height(36.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_phone),
+                            contentDescription = null,
+                            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.surfaceTint)
+                        )
+                        Text(modifier = Modifier.padding(horizontal = 8.dp), text = employee.phone)
+                    }
                 }
             }
         }
