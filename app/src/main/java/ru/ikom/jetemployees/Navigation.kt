@@ -45,7 +45,8 @@ interface Navigation<T> {
         }
 
         override fun openDetails(data: String) {
-            update(NavigationCommand.Forward(DetailsScreen(data)))
+            TODO()
+            //update(NavigationCommand.Forward(DetailsScreen(data)))
         }
 
         override fun pop() {

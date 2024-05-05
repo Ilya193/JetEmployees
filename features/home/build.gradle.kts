@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("kotlin-parcelize")
 }
 
 android {
@@ -52,4 +51,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.modo.compose)
+
+    implementation("com.arkivanov.decompose:decompose:3.0.0")
+    implementation("com.arkivanov.decompose:extensions-compose:3.0.0")
+    implementation("com.arkivanov.essenty:lifecycle-coroutines:2.0.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 }
