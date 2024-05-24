@@ -1,5 +1,7 @@
 package ru.ikom.home.presentation
 
+import kotlinx.serialization.Serializable
+
 data class HomeUiState(
     val employeesState: EmployeesUiState = EmployeesUiState.Loading,
     val departments: List<DepartmentUi> = generateDepartments(),
@@ -22,6 +24,7 @@ sealed interface EmployeesUiState {
     ) : EmployeesUiState
 }
 
+@Serializable
 data class FilterUiState(val filter: FilterMode? = null, val show: Boolean = false)
 
 enum class NothingFound {

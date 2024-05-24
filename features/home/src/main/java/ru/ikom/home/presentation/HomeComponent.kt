@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.ikom.home.domain.EmployeesRepository
@@ -20,6 +21,7 @@ interface HomeComponent {
 
     fun action(event: Event)
 
+    @Serializable
     data class Model(
         val employeesState: EmployeesUiState = EmployeesUiState.Loading,
         val departments: List<DepartmentUi> = generateDepartments(),
@@ -38,12 +40,15 @@ class HomeComponentImpl(
 ) : HomeComponent, ComponentContext by componentContext {
     private val scope = componentContext.coroutineScope(Dispatchers.IO + SupervisorJob())
 
+    //MutableStateFlow(stateKeeper.consume("SAVED_STATE", HomeComponent.Model.serializer()) ?: HomeComponent.Model())
     private val _state = MutableStateFlow(HomeComponent.Model())
     override val state: StateFlow<HomeComponent.Model> = _state.asStateFlow()
     private var employees = mutableListOf<EmployeeUi>()
     private var showEmployees = mutableListOf<EmployeeUi>()
 
     init {
+        //stateKeeper.register("SAVED_STATE", HomeComponent.Model.serializer()) { _state.value }
+
         fetchEmployees(true)
     }
 
